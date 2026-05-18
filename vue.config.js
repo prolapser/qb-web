@@ -1,6 +1,7 @@
 module.exports = {
   outputDir: 'dist/public',
   publicPath: './',
+  productionSourceMap: false,
 
   pwa: {
     // name: "qb-web",
