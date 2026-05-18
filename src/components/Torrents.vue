@@ -522,7 +522,7 @@ export default class Torrents extends Vue {
     let magnetLinks = "";
     this.selectedRows.forEach(item => {
       const magnetLink = long ? item.magnet_uri : 'magnet:?xt=urn:btih:' + item.hash;
-      magnetLinks = magnetLinks + magnetLink + "\n";
+      magnetLinks = magnetLinks + magnetLink + "\r\n";
     });
     await this.copyText(magnetLinks);
     this.showSnackBar({text: tr('copied')})
