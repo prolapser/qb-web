@@ -507,23 +507,31 @@ export default class Torrents extends Vue {
 
   async copyText(text: string) {
     if (navigator.clipboard) {
-      await navigator.clipboard.writeText(text)
-    } else {
-      let copyInput = document.createElement('input');
-      copyInput.value = text;
-      document.body.appendChild(copyInput);
-      copyInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(copyInput);
+      try {
+        await navigator.clipboard.writeText(text)
+        return
+      } catch (e) {
+        // Fall back for insecure origins or denied clipboard permissions.
+      }
     }
+
+    const copyInput = document.createElement('textarea');
+    copyInput.value = text;
+    copyInput.setAttribute('readonly', '');
+    copyInput.style.position = 'fixed';
+    copyInput.style.top = '0';
+    copyInput.style.left = '-9999px';
+    document.body.appendChild(copyInput);
+    copyInput.select();
+    copyInput.setSelectionRange(0, copyInput.value.length);
+    document.execCommand('copy');
+    document.body.removeChild(copyInput);
   }
 
   async copyMagnetLink(long: boolean) {
-    let magnetLinks = "";
-    this.selectedRows.forEach(item => {
-      const magnetLink = long ? item.magnet_uri : 'magnet:?xt=urn:btih:' + item.hash;
-      magnetLinks = magnetLinks + magnetLink + "\r\n";
-    });
+    const magnetLinks = this.selectedRows
+      .map(item => long ? item.magnet_uri : 'magnet:?xt=urn:btih:' + item.hash)
+      .join('\n');
     await this.copyText(magnetLinks);
     this.showSnackBar({text: tr('copied')})
   }
