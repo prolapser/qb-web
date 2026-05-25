@@ -5,6 +5,8 @@ const emptyBaseTorrent: BaseTorrent = {
   added_on: 0,
   amount_left: 0,
   auto_tmm: false,
+  isPrivate: false,
+  reannounce: 0,
   availability: 0,
   category: '',
   completed: 0,

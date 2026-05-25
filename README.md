@@ -1,9 +1,9 @@
 # qb-web
 
 ## 2025.06.17
-- 添加复制磁链功能
-- 优化种子信息弹窗，避免切换tab时跳动
-- 优化工具栏按钮，继续和暂停按钮修改为开始和停止按钮
+- Added copy magnet link function
+- Optimize the seed information pop-up window to avoid jumping when switching tabs
+- Optimize the toolbar buttons, change the continue and pause buttons to start and stop buttons
 
 ## Info
 [![Tested](https://img.shields.io/badge/Tested-qBittorrent%20≥%20v4.2.5-brightgreen)](#)
@@ -16,7 +16,7 @@ Keywords: SPA, RSS, Search, Responsive Design, Modern Design, i18n
 
 Languages: English, 中文, Русский, Türkçe
 
-[TODO](https://github.com/CzBiX/qb-web/projects/2)
+
 
 ## How to use
 see: [Wiki](https://github.com/CzBiX/qb-web/wiki/How-to-use)

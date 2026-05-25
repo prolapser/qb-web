@@ -8,6 +8,7 @@ import {
   SearchTaskResponse,
   Preferences,
   MainData,
+  Cookie,
 } from '@/types'
 
 const apiEndpoint = 'api/v2';
@@ -81,11 +82,13 @@ class Api {
 
   public addTorrents(params: Record<string, any>, torrents?: any) {
     let data: any;
+
+    const { cookie, ...filteredParams } = params;
+
     if (torrents) {
       const formData = new FormData();
-      for (const [key, value] of Object.entries(params)) {
-        // eslint-disable-next-line
-        formData.append(key, value);
+      for (const [key, value] of Object.entries(filteredParams)) {
+        formData.append(key, value as any);
       }
 
       for (const torrent of torrents) {
@@ -94,7 +97,7 @@ class Api {
 
       data = formData;
     } else {
-      data = new URLSearchParams(params);
+      data = new URLSearchParams(filteredParams);
     }
     return this.axios.post('/torrents/add', data).then(Api.handleResponse);
   }
@@ -146,11 +149,11 @@ class Api {
   }
 
   public pauseTorrents(hashes: string[]) {
-    return this.actionTorrents('pause', hashes);
+    return this.actionTorrents('stop', hashes);
   }
 
   public resumeTorrents(hashes: string[]) {
-    return this.actionTorrents('resume', hashes);
+    return this.actionTorrents('start', hashes);
   }
 
   public startTorrents(hashes: string[]) {
@@ -196,8 +199,24 @@ class Api {
     }).then(Api.handleResponse);
   }
 
+  public addTrackersToTorrent(hash: string, urls: string[]) {
+    const data = new URLSearchParams({
+      hash,
+      urls: urls.join('\n'),
+    });
+    return this.axios.post('/torrents/addTrackers', data).then(Api.handleResponse);
+  }
+
   public editTracker(hash: string, origUrl: string, newUrl: string) {
     return this.actionTorrent('editTracker', hash, { origUrl, newUrl });
+  }
+
+  public removeTrackers(hash: string, urls: string[]) {
+    const data = new URLSearchParams({
+      hash,
+      urls: urls.join('|'),
+    });
+    return this.axios.post('/torrents/removeTrackers', data).then(Api.handleResponse);
   }
 
   public setTorrentLocation(hashes: string[], location: string) {
@@ -224,6 +243,16 @@ class Api {
     }).then(Api.handleResponse);
   }
 
+  public getTorrentPieceHashes(hash: string) {
+    const params = {
+      hash,
+    };
+
+    return this.axios.get('/torrents/pieceHashes', {
+      params,
+    }).then(Api.handleResponse);
+  }
+
   public getTorrentFiles(hash: string) {
     const params = {
       hash,
@@ -233,6 +262,39 @@ class Api {
       params,
     }).then(Api.handleResponse);
   }
+
+  public renameFile(hash: string, oldPath: string, newPath: string) {
+    const data = new URLSearchParams({
+      hash,
+      oldPath,
+      newPath,
+    });
+    return this.axios.post('/torrents/renameFile', data).then(Api.handleResponse);
+  }
+
+  public renameFolder(hash: string, oldPath: string, newPath: string) {
+    const data = new URLSearchParams({
+      hash,
+      oldPath,
+      newPath,
+    });
+    return this.axios.post('/torrents/renameFolder', data).then(Api.handleResponse);
+  }
+
+  // Cookie management
+
+  public getCookies(): Promise<Cookie[]> {
+    return this.axios.get('/app/cookies').then(Api.handleResponse);
+  }
+
+  public setCookies(cookies: Partial<Cookie>[]) {
+    const data = new URLSearchParams({
+      json: JSON.stringify(cookies),
+    });
+    return this.axios.post('/app/setCookies', data).then(Api.handleResponse);
+  }
+
+  // RSS
 
   public getRssItems(): Promise<RssNode> {
     const params = {

@@ -16,10 +16,11 @@
         :label="$t('preferences.start_paused_enabled')"
         @change="changeSettings('start_paused_enabled', !preferences.start_paused_enabled)"
       />
+      <!-- auto_delete_mode can be returned as a number (0, 1), convert to boolean for v-switch to work correctly -->
       <v-switch
-        :input-value="preferences.auto_delete_mode"
+        :input-value="!!preferences.auto_delete_mode"
         :label="$t('preferences.auto_delete_mode')"
-        @change="changeSettings('auto_delete_mode', !preferences.auto_delete_mode)"
+        @change="changeSettings('auto_delete_mode', preferences.auto_delete_mode ? 0 : 1)"
       />
     </v-container>
     <v-divider />
@@ -56,7 +57,7 @@
         <v-select
           dense
           :items="torrentAction"
-          :value="preferences.category_changed_tmm_enabled ? torrentAction[1] : torrentAction[0]"
+          :value="preferences.torrent_changed_tmm_enabled ? torrentAction[1] : torrentAction[0]"
           @change="changeSettings('torrent_changed_tmm_enabled', $event == torrentAction[1])"
         />
       </preference-row>
@@ -64,7 +65,7 @@
         <v-select
           dense
           :items="torrentAction"
-          :value="preferences.category_changed_tmm_enabled ? torrentAction[1] : torrentAction[0]"
+          :value="preferences.save_path_changed_tmm_enabled ? torrentAction[1] : torrentAction[0]"
           @change="changeSettings('save_path_changed_tmm_enabled', $event == torrentAction[1])"
         />
       </preference-row>
@@ -88,7 +89,7 @@
         <template #header>
           <v-checkbox
             dense
-            :value="preferences.temp_path_enabled"
+            :input-value="preferences.temp_path_enabled"
             @change="changeSettings('temp_path_enabled', $event)"
           />
         </template>
@@ -156,7 +157,7 @@ export default class DownloadSettings extends Vue {
 
   updatePreferencesRequest!: (_: any) => void
 
-  changeSettings(property: string, value: string | boolean) {
+  changeSettings(property: string, value: string | boolean | number) {
     this.updatePreferencesRequest({[property]: value})
   }
 }

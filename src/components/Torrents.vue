@@ -47,7 +47,7 @@
           vertical
           inset
         />
-        <v-btn 
+        <v-btn
           icon
           @click="copyMagnetLink(true)"
           :title="$t('copy_magnet_link')"
@@ -290,19 +290,14 @@ function getStateInfo(state: string) {
         color: null,
       };
       break;
-    case 'stoppedDL': {
-      icon = {
-        icon: 'stop',
-        color: 'warning',
-      };
-      break;
-    }
+    case 'stoppedDL':
     case 'pausedDL':
       icon = {
         icon: 'pause',
         color: 'warning',
       };
       break;
+    case 'stoppedUP':
     case 'pausedUP':
       icon = {
         icon: 'check',
@@ -335,7 +330,10 @@ function getStateInfo(state: string) {
       };
       break;
     default:
-      throw Error('Unknown state');
+      icon = {
+        icon: 'help-circle-outline',
+        color: null,
+      };
   }
 
   return icon;

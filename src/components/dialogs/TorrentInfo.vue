@@ -109,7 +109,8 @@ export default class TorrentInfo extends BaseTorrentInfo {
     return [
       {
         label: tr('properties_widget.timeActive'),
-        value: prop => formatDuration(prop.time_elapsed) + (prop.seeding_time ? ` ($tr('properties_widget.seeded') ${formatDuration(prop.seeding_time)})` : ''),
+        // Исправлена синтаксическая ошибка интернационализации $tr -> tr
+        value: prop => formatDuration(prop.time_elapsed) + (prop.seeding_time ? ` (${tr('properties_widget.seeded')} ${formatDuration(prop.seeding_time)})` : ''),
       },
       { label: tr('properties_widget.eta'), value: prop => formatDuration(prop.eta, { dayLimit: 100 }) },
       { label: tr('properties_widget.connections'), value: prop => `${prop.nb_connections} (${prop.nb_connections_limit} ${tr('properties_widget.max')})` },
@@ -137,12 +138,14 @@ export default class TorrentInfo extends BaseTorrentInfo {
       { label: tr('properties_widget.torrentHash'), value: () => this.torrent.hash },
       { label: tr('properties_widget.savePath'), value: prop => prop.save_path },
       { label: tr('properties_widget.comment'), value: prop => prop.comment },
+      // Добавлено отображение флага приватности из API v5.0+
+      { label: tr('properties_widget.isPrivate') || 'Private', value: prop => prop.isPrivate ? (tr('yes') || 'Yes') : (tr('no') || 'No') },
     ]
-  } 
+  }
 
   pieces: PieceState[] = []
   canvas: CanvasRenderingContext2D | null = null
-    
+
   async getData() {
     this.properties = await api.getTorrentProperties(this.torrent.hash);
     this.pieces = await api.getTorrentPieceStates(this.torrent.hash);

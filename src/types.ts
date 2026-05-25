@@ -14,6 +14,8 @@ export interface BaseTorrent {
   eta: number;
   f_l_piece_prio: boolean;
   force_start: boolean;
+  // hash: string;
+  isPrivate: boolean;
   last_activity: number;
   magnet_uri: string;
   max_ratio: number;
@@ -27,6 +29,7 @@ export interface BaseTorrent {
   progress: number;
   ratio: number;
   ratio_limit: number;
+  reannounce: number;
   save_path: string;
   seeding_time_limit: number;
   seen_complete: number;
@@ -100,7 +103,7 @@ export interface ServerState {
 
 export interface MainData {
   categories: Record<string, Category>;
-  tags: [string];
+  tags: string[];
   server_state: ServerState;
   torrents: Record<string, BaseTorrent>;
 }
@@ -157,6 +160,7 @@ export interface TorrentProperties {
   dl_speed: number;
   dl_speed_avg: number;
   eta: number;
+  isPrivate: boolean;
   last_seen: number;
   nb_connections: number;
   nb_connections_limit: number;
@@ -190,7 +194,11 @@ export interface Preferences {
   alt_up_limit: number;
   alternative_webui_enabled: boolean;
   alternative_webui_path: string;
+  announce_ip?: string;
+  announce_to_all_tiers?: boolean;
+  announce_to_all_trackers?: boolean;
   anonymous_mode: boolean;
+  async_io_threads?: number;
   auto_delete_mode: number;
   auto_tmm_enabled: boolean;
   autorun_enabled: boolean;
@@ -201,8 +209,13 @@ export interface Preferences {
   bypass_auth_subnet_whitelist_enabled: boolean;
   bypass_local_auth: boolean;
   category_changed_tmm_enabled: boolean;
+  checking_memory_use?: number;
   create_subfolder_enabled: boolean;
+  current_interface_address?: string;
+  current_network_interface?: string;
   dht: boolean;
+  disk_cache?: number;
+  disk_cache_ttl?: number;
   dl_limit: number;
   dont_count_slow_torrents: boolean;
   dyndns_domain: string;
@@ -210,9 +223,17 @@ export interface Preferences {
   dyndns_password: string;
   dyndns_service: number;
   dyndns_username: string;
+  embedded_tracker_port?: number;
+  enable_coalesce_read_write?: boolean;
+  enable_embedded_tracker?: boolean;
+  enable_multi_connections_from_same_ip?: boolean;
+  enable_os_cache?: boolean;
+  enable_piece_extent_affinity?: boolean;
+  enable_upload_suggestions?: boolean;
   encryption: number;
   export_dir: string;
   export_dir_fin: string;
+  file_pool_size?: number;
   force_proxy: boolean;
   incomplete_files_ext: boolean;
   ip_filter_enabled: boolean;
@@ -244,6 +265,8 @@ export interface Preferences {
   max_seeding_time_enabled: boolean;
   max_uploads: number;
   max_uploads_per_torrent: number;
+  outgoing_ports_max?: number;
+  outgoing_ports_min?: number;
   pex: boolean;
   preallocate_all: boolean;
   proxy_auth_enabled: boolean;
@@ -256,12 +279,17 @@ export interface Preferences {
   proxy_username: string;
   queueing_enabled: boolean;
   random_port: boolean;
+  recheck_completed_torrents?: boolean;
+  resolve_peer_countries?: boolean;
   rss_auto_downloading_enabled: boolean;
+  rss_download_repack_proper_episodes?: boolean;
   rss_max_articles_per_feed: number;
   rss_processing_enabled: boolean;
   rss_refresh_interval: number;
+  rss_smart_episode_filters?: string;
   save_path: string;
   save_path_changed_tmm_enabled: boolean;
+  save_resume_data_interval?: number;
   scan_dirs: { [key: string]: string | number };
   schedule_from_hour: number;
   schedule_from_min: number;
@@ -269,9 +297,13 @@ export interface Preferences {
   schedule_to_min: number;
   scheduler_days: number;
   scheduler_enabled: boolean;
+  send_buffer_low_watermark?: number;
+  send_buffer_watermark?: number;
+  send_buffer_watermark_factor?: number;
   slow_torrent_dl_rate_threshold: number;
   slow_torrent_inactive_timer: number;
   slow_torrent_ul_rate_threshold: number;
+  socket_backlog_size?: number;
   ssl_cert: string;
   ssl_key: string;
   start_paused_enabled: boolean;
@@ -279,16 +311,25 @@ export interface Preferences {
   temp_path_enabled: boolean;
   torrent_changed_tmm_enabled: boolean;
   up_limit: number;
+  upload_choking_algorithm?: number;
+  upload_slots_behavior?: number;
   upnp: boolean;
+  upnp_lease_duration?: number;
   use_https: boolean;
+  utp_tcp_mixed_mode?: number;
   web_ui_address: string;
   web_ui_clickjacking_protection_enabled: boolean;
   web_ui_csrf_protection_enabled: boolean;
+  web_ui_custom_http_headers?: string;
   web_ui_domain_list: string;
   web_ui_host_header_validation_enabled: boolean;
+  web_ui_https_cert_path?: string;
+  web_ui_https_key_path?: string;
   web_ui_password: string;
   web_ui_port: number;
+  web_ui_secure_cookie_enabled?: boolean;
   web_ui_upnp: boolean;
+  web_ui_use_custom_http_headers_enabled?: boolean;
   web_ui_username: string;
   web_ui_max_auth_fail_count: number;
   web_ui_ban_duration: number;
@@ -318,4 +359,12 @@ export interface SearchTaskResponse {
   results: SearchTaskTorrent[];
   status: 'Running' | 'Stopped';
   total: number;
+}
+
+export interface Cookie {
+  name: string;
+  domain: string;
+  path: string;
+  value: string;
+  expirationDate: number;
 }

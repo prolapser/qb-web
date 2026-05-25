@@ -69,8 +69,8 @@
                     <v-checkbox
                       prepend-icon="mdi-file-tree"
                       :label="$t('label.create_subfolder')"
-                      :input-value="true"
-                      @change="setParams('root_path', $event)"
+                      :input-value="params.root_folder"
+                      @change="setParams('root_folder', $event)"
                     />
                   </v-col>
                   <v-col
@@ -146,7 +146,7 @@
                     <v-checkbox
                       :label="$t('label.in_sequential_order')"
                       prepend-icon="mdi-sort-descending"
-                      :ipnut-value="params.sequentialDownload"
+                      :input-value="params.sequentialDownload"
                       @change="setParams('sequentialDownload', $event)"
                     />
                   </v-col>
@@ -210,19 +210,17 @@ import { Watch } from 'vue-property-decorator';
 import { Preferences, Category } from '../types';
 import { AddFormState } from '@/store/types';
 
-/* eslint-disable */
 const defaultParams = {
   urls: '',
   category: '',
   paused: false,
   savepath: '',
   skip_checking: false,
-  root_path: false,
+  root_folder: false, // Изменено с root_path в соответствии с API v5.0
   sequentialDownload: false,
   firstLastPiecePrio: false,
   autoTMM: false,
 };
-/* eslint-enable @typescript-eslint/camelcase */
 
 @Component({
   computed: {
@@ -279,7 +277,7 @@ export default class AddForm extends Vue {
       const category = this.allCategories.find(c => {
         return c.key === this.params.category;
       });
-      
+
       if (!category) {
         return this.params.category;
       }
@@ -292,14 +290,15 @@ export default class AddForm extends Vue {
 
   created() {
     defaultParams.paused = this.prefs.start_paused_enabled;
-    /* eslint-disable-next-line @typescript-eslint/camelcase */
-    defaultParams.root_path = this.prefs.create_subfolder_enabled;
+    defaultParams.root_folder = this.prefs.create_subfolder_enabled; // Изменено с root_path
     defaultParams.savepath = this.prefs.save_path;
     defaultParams.autoTMM = this.prefs.auto_tmm_enabled;
   }
 
   mounted() {
-    this.$refs.fileZone.addEventListener('drop', this.onDrop, true);
+    if (this.$refs.fileZone) {
+      this.$refs.fileZone.addEventListener('drop', this.onDrop, true);
+    }
   }
 
   @Watch('state', {deep: true})
@@ -310,7 +309,9 @@ export default class AddForm extends Vue {
   }
 
   beforeDestroy() {
-    this.$refs.fileZone.removeEventListener('drop', this.onDrop, true);
+    if (this.$refs.fileZone) {
+      this.$refs.fileZone.removeEventListener('drop', this.onDrop, true);
+    }
   }
 
   setParams(key: keyof typeof defaultParams, value: any) {
@@ -362,7 +363,9 @@ export default class AddForm extends Vue {
 
   selectFiles() {
     const input = this.$refs.file.$el.querySelector('input[type=file]');
-    input.click();
+    if (input) {
+      input.click();
+    }
   }
 
   onDrop(e: DragEvent) {

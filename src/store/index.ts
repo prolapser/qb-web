@@ -51,15 +51,17 @@ const store = new Vuex.Store<RootState>({
         }
         if (payload.categories_removed) {
           for (const key of payload.categories_removed) {
-            Vue.delete(mainData, key);
+            if (mainData.categories) {
+              Vue.delete(mainData.categories, key);
+            }
           }
           delete payload.categories_removed;
         }
-        if (payload.tags_removed) {
-          for (const key of payload.tags_removed) {
-            Vue.delete(mainData, key);
-          }
-          delete payload.categories_removed;
+        if (payload.tags_removed && mainData.tags) {
+          mainData.tags = mainData.tags.filter(
+            (tag) => !payload.tags_removed.includes(tag),
+          );
+          delete payload.tags_removed;
         }
         stateMerge(mainData, payload);
       }
@@ -84,7 +86,7 @@ const store = new Vuex.Store<RootState>({
       return state.preferences;
     },
     savePath(state) {
-      return state.preferences['save_path'];
+      return state.preferences ? state.preferences['save_path'] : '';
     },
     isDataReady(state) {
       return !!state.mainData;
@@ -148,8 +150,12 @@ const store = new Vuex.Store<RootState>({
           return '';
         }
 
-        const url = new URL(torrent.tracker);
-        return url.hostname;
+        try {
+          const url = new URL(torrent.tracker);
+          return url.hostname;
+        } catch {
+          return torrent.tracker;
+        }
       });
     },
     torrentGroupByState(__, getters) {
