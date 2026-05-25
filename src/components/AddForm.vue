@@ -340,19 +340,36 @@ export default class AddForm extends Vue {
     try {
       const resp = await api.addTorrents(this.userParams, files);
 
-      if (resp !== 'Ok.') {
-        this.error = resp;
+      let isSuccess = false;
+
+      if (resp === 'Ok.') {
+        isSuccess = true;
+      }
+      // v5.0+
+      else if (resp && typeof resp === 'object') {
+        if (resp.success_count > 0) {
+          isSuccess = true;
+        } else if (resp.failure_count > 0) {
+          this.error = `Failed to add torrent(s). Failure count: ${resp.failure_count}`;
+        } else {
+          this.error = 'No torrents were added.';
+        }
+      }
+      else {
+        this.error = resp || 'Unknown response from server';
+      }
+
+      if (!isSuccess) {
+        this.submitting = false;
+        return;
       }
     } catch (e: any) {
       this.error = e.message;
-    }
-
-    this.submitting = false;
-
-    if (this.error) {
+      this.submitting = false;
       return;
     }
 
+    this.submitting = false;
     this.closeAddForm();
 
     Vue.delete(this.userParams, 'urls');
